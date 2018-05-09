@@ -1,0 +1,38 @@
+{
+    "name": "depage/newsletter",
+    "description": "depage-newsletter is a newsletter subscription handling class",
+    "version": "1.0.0",
+    "type": "library",
+    "keywords": [
+        "newsletter",
+        "subscription",
+        "email"
+    ],
+    "require": {
+        "php": " >= 7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.5"
+    },
+    "autoload": {
+        "psr-4": { "Depage\\Newsletter\\": "" }
+    },
+    "support": {
+        "email": "info@depage.net",
+        "source": "https://github.com/depage/depage-newsletter",
+        "issues": "https://github.com/depage/depage-newsletter/issues"
+
+    },
+    "time": "2018-04-09",
+    "license": [
+        "MIT",
+        "GPL-2.0"
+    ],
+    "authors": [
+        {
+            "name": "Frank Hellenkamp",
+            "homepage": "http://depage.net",
+            "role": "Developer"
+        }
+    ]
+}
