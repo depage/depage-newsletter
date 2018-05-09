@@ -15,7 +15,7 @@ namespace Depage\Newsletter;
  * @brief Subscription
  * Class Subscription
  */
-class Subscription
+abstract class Subscription
 {
     // {{{ __construct()
     /**
@@ -62,10 +62,7 @@ class Subscription
      * @param mixed
      * @return void
      **/
-    abstract public function subscribe($email, $firstname = "", $lastname = "", $description = "", $lang = "en", $category = "Default")
-    {
-
-    }
+    abstract public function subscribe($email, $firstname = "", $lastname = "", $description = "", $lang = "en", $category = "Default");
     // }}}
 
     // {{{ confirm()
@@ -75,10 +72,7 @@ class Subscription
      * @param mixed $validation
      * @return void
      **/
-    abstract public function confirm($validation)
-    {
-
-    }
+    abstract public function confirm($validation);
     // }}}
 
     // {{{ unsubscribe()
@@ -88,10 +82,7 @@ class Subscription
      * @param mixed
      * @return void
      **/
-    abstract public function unsubscribe($email, $lang = "en", $category = "Default")
-    {
-
-    }
+    abstract public function unsubscribe($email, $lang = "en", $category = "Default");
     // }}}
 }
 
