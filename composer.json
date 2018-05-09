@@ -9,7 +9,11 @@
         "email"
     ],
     "require": {
-        "php": " >= 7.0"
+        "php": " >= 7.0",
+        "depage/db": "dev-master",
+        "depage/htmlform": "dev-master",
+        "depage/http": "dev-master",
+        "depage/mail": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.5"
