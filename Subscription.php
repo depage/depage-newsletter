@@ -17,18 +17,34 @@ namespace Depage\Newsletter;
  */
 abstract class Subscription
 {
+    // {{{ variables
+    /**
+     * @brief lang
+     **/
+    protected $lang = "en";
+
+    /**
+     * @brief category
+     **/
+    protected $category = "Default";
+    // }}}
+
     // {{{ __construct()
     /**
      * @brief __construct
      *
-     * @param mixed
+     * @param mixed $params
      * @return void
      **/
-    public function __construct()
+    public function __construct($params)
     {
+        // @todo check parameters
+        $this->lang = $params['lang'] ?? "en";
+        $this->category = $params['category'] ?? "Default";
+        $this->subscribeForm = $params['subscribeForm'] ?? Forms\Subscribe("newsletterSubscribe");
+        $this->unsubscribeForm = $params['unsubscribeForm'] ?? Forms\Unsubscribe("newsletterUnsubscribe");
     }
     // }}}
-
     // {{{ factory()
     /**
      * @brief factory
@@ -38,7 +54,13 @@ abstract class Subscription
      **/
     public function factory($provider, $params)
     {
-
+        if ($provider == "remote" || $provider == "api") {
+            return new \Depage\Newsletter\Providers\Remote($params);
+        } else if ($provider == "pdo") {
+            return new \Depage\Newsletter\Providers\Pdo($params);
+        } else {
+            return false;
+        }
     }
     // }}}
 
@@ -51,7 +73,79 @@ abstract class Subscription
      **/
     public function process()
     {
+        if (isset($_GET['confirm'])) {
+            return $this->processConfirmation();
+        } else if (isset($_GET['unsubscribe'])) {
+            return $this->processUnsubscribe();
+        } else {
+            return $this->processSubscribe();
+        }
+    }
+    // }}}
 
+    // {{{ processSubscribe()
+    /**
+     * @brief processSubscribe
+     *
+     * @param mixed
+     * @return void
+     **/
+    protected function processSubscribe()
+    {
+        $form = $this->subscribeForm;
+        $form->process();
+
+        if ($form->valid) {
+            $values = $form->getValues() + [
+                'firstname' => "",
+                'lastname' => "",
+                'description' => "",
+                'lang' => $this->lang,
+                'category' => $this->category,
+            ];
+            $this->subscribe(
+                $values['email'],
+                $values['firstname'],
+                $values['lastname'],
+                $values['description'],
+                $values['lang'],
+                $values['category']
+            );
+            die();
+            //$form->clearSession();
+        }
+
+        return $form;
+    }
+    // }}}
+    // {{{ processConfirmation()
+    /**
+     * @brief processConfirmation
+     *
+     * @param mixed
+     * @return void
+     **/
+    protected function processConfirmation()
+    {
+        return $confirm;
+    }
+    // }}}
+    // {{{ processUnsubscribe()
+    /**
+     * @brief processUnsubscribe
+     *
+     * @param mixed
+     * @return void
+     **/
+    protected function processUnsubscribe()
+    {
+        $form = $this->unsubscribeForm;
+        $form->process();
+
+        if ($form->valid) {
+        }
+
+        return $form;
     }
     // }}}
 
@@ -83,6 +177,19 @@ abstract class Subscription
      * @return void
      **/
     abstract public function unsubscribe($email, $lang = "en", $category = "Default");
+    // }}}
+
+    // {{{ sendConfirmationMail()
+    /**
+     * @brief sendConfirmationMail
+     *
+     * @param mixed
+     * @return void
+     **/
+    protected function sendConfirmationMail($email, $validation, $firstname = "", $lastname = "", $description = "", $lang = "en", $category = "Default")
+    {
+
+    }
     // }}}
 }
 
