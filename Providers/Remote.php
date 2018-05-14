@@ -66,7 +66,32 @@ class Remote extends \Depage\Newsletter\Subscription
 
         $this->sendConfirmationMail($email, $response->getJson()['success'], $firstname, $lastname, $description, $lang, $category);
 
-        return $response->getJson()->success;
+        return $response->getJson()['success'];
+    }
+    // }}}
+    // {{{ isSubscriber()
+    /**
+     * @brief isSubscriber
+     *
+     * @param mixed $param
+     * @return void
+     **/
+    public function isSubscriber($email, $lang = "en", $category = "Default")
+    {
+        $url = $this->apiUrl . "newsletter/is-subscriber/";
+
+        $values = [
+            'email' => $email,
+            'lang' => $lang,
+            'category' => $category,
+        ];
+
+        $request = new \Depage\Http\Request($url);
+        $response = $request
+            ->setJson($values)
+            ->execute();
+
+        return $response->getJson()['success'];
     }
     // }}}
     // {{{ confirm()
@@ -89,7 +114,7 @@ class Remote extends \Depage\Newsletter\Subscription
             ->setJson($values)
             ->execute();
 
-        return $response->getJson()->success;
+        return $response->getJson()['success'];
     }
     // }}}
     // {{{ unsubscribe()
@@ -114,7 +139,7 @@ class Remote extends \Depage\Newsletter\Subscription
             ->setJson($values)
             ->execute();
 
-        return $response->getJson()->success;
+        return $response->getJson()['success'];
     }
     // }}}
 }

@@ -123,6 +123,15 @@ abstract class Subscription
                 'lang' => $this->lang,
                 'category' => $this->category,
             ];
+            $form->clearSession();
+
+            if ($this->isSubscriber($values['email'], $values['lang'], $values['category'])) {
+                return "<p>" . sprintf(
+                    _("You're already a subscriber to our newsletter '%s'."),
+                    htmlentities($values['email'])
+                ) . "</p>";
+            }
+
             $this->subscribe(
                 $values['email'],
                 $values['firstname'],
@@ -131,7 +140,6 @@ abstract class Subscription
                 $values['lang'],
                 $values['category']
             );
-            $form->clearSession();
 
             return "<p>" . sprintf(
                 _("Please confirm your subscription, by opening the link in the email we just send to '%s'."),
@@ -196,7 +204,15 @@ abstract class Subscription
      **/
     abstract public function subscribe($email, $firstname = "", $lastname = "", $description = "", $lang = "en", $category = "Default");
     // }}}
-
+    // {{{ isSubscriber()
+    /**
+     * @brief
+     *
+     * @param mixed
+     * @return void
+     **/
+    abstract public function isSubscriber($email, $lang = "en", $category = "Default");
+    // }}}
     // {{{ confirm()
     /**
      * @brief confirm
@@ -206,7 +222,6 @@ abstract class Subscription
      **/
     abstract public function confirm($validation);
     // }}}
-
     // {{{ unsubscribe()
     /**
      * @brief
