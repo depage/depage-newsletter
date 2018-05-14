@@ -29,9 +29,19 @@ abstract class Subscription
     protected $category = "Default";
 
     /**
+     * @brief title
+     **/
+    protected $title = "";
+
+    /**
      * @brief sender
      **/
     protected $sender = "";
+
+    /**
+     * @brief notify
+     **/
+    protected $notify = null;
 
     /**
      * @brief subscribeForm
@@ -55,8 +65,10 @@ abstract class Subscription
     {
         // @todo check parameters
         $this->sender = $params['sender'];
+        $this->notify = $params['notify'] ?? null;
         $this->lang = $params['lang'] ?? "en";
         $this->category = $params['category'] ?? "Default";
+        $this->title = $params['title'] ?? "";
         $this->subscribeForm = $params['subscribeForm'] ?? Forms\Subscribe("newsletterSubscribe");
         $this->unsubscribeForm = $params['unsubscribeForm'] ?? Forms\Unsubscribe("newsletterUnsubscribe");
         $this->url = $params['url'] ?? (
@@ -182,7 +194,7 @@ abstract class Subscription
         if ($form->valid) {
             $values = $form->getValues();
 
-            $this->unsubscribe($values['email']);
+            $this->unsubscribe($values['email'], $this->lang, $this->category);
             $form->clearSession();
 
             return "<p>" . sprintf(
@@ -247,11 +259,81 @@ abstract class Subscription
             _("Dear Subscriber,\n\nPlease open the following link to validate you registration to the newsletter:\n") .
             "{$url}\n";
 
+        $title = $this->title;
+        if (!empty($title)) {
+            $title .= " . ";
+        }
+
         $mail = new \Depage\Mail\Mail($this->sender);
         $mail
-            ->setSubject(_("Newsletter Confirmation"))
+            ->setSubject($title . _("Newsletter Confirmation"))
             ->setText($text)
             ->send($email);
+    }
+    // }}}
+    // {{{ sendSubscribeNotification()
+    /**
+     * @brief sendSubscribeNotification
+     *
+     * @param mixed
+     * @return void
+     **/
+    protected function sendSubscribeNotification($email, $firstname = "", $lastname = "", $description = "", $lang = "en", $category = "Default")
+    {
+        if (empty($this->notify)) {
+            return;
+        }
+
+        $text =
+            _("There is a new subscriber to the newsletter:\n\n") .
+            _("Email: ") . "$email\n" .
+            _("First name: ") . "$firstname\n" .
+            _("Last name: ") . "$lastname\n" .
+            _("Description: ") . "$description\n" .
+            _("Language: ") . "$lang\n" .
+            _("Category: ") . "$category\n";
+
+        $title = $this->title;
+        if (!empty($title)) {
+            $title .= " . ";
+        }
+
+        $mail = new \Depage\Mail\Mail($this->sender);
+        $mail
+            ->setSubject($title . _("New Newsletter Subscriber"))
+            ->setText($text)
+            ->send($this->notify);
+    }
+    // }}}
+    // {{{ sendUnsubscribeNotification()
+    /**
+     * @brief sendUnsubscribeNotification
+     *
+     * @param mixed
+     * @return void
+     **/
+    protected function sendUnsubscribeNotification($email, $lang = "en", $category = "Default")
+    {
+        if (empty($this->notify)) {
+            return;
+        }
+
+        $text =
+            _("A subscriber has unsubscribed the newsletter:\n\n") .
+            _("Email: ") . "$email\n" .
+            _("Language: ") . "$lang\n" .
+            _("Category: ") . "$category\n";
+
+        $title = $this->title;
+        if (!empty($title)) {
+            $title .= " . ";
+        }
+
+        $mail = new \Depage\Mail\Mail($this->sender);
+        $mail
+            ->setSubject($title . _("Newsletter unsubscribed"))
+            ->setText($text)
+            ->send($this->notify);
     }
     // }}}
 }

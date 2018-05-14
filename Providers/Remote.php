@@ -114,6 +114,12 @@ class Remote extends \Depage\Newsletter\Subscription
             ->setJson($values)
             ->execute();
 
+        $subscriber = $response->getJson()['subscriber'];
+
+        if ($subscriber) {
+            $this->sendSubscribeNotification($subscriber['email'], $subscriber['firstname'], $subscriber['lastname'], $subscriber['description'], $subscriber['lang'], $subscriber['category']);
+        }
+
         return $response->getJson()['success'];
     }
     // }}}
@@ -139,11 +145,15 @@ class Remote extends \Depage\Newsletter\Subscription
             ->setJson($values)
             ->execute();
 
-        return $response->getJson()['success'];
+        $success = $response->getJson()['success'];
+
+        if ($success) {
+            $this->sendUnsubscribeNotification($email, $lang, $category);
+        }
+
+        return $success;
     }
     // }}}
 }
-
-
 
 // vim:set ft=php sw=4 sts=4 fdm=marker et :
