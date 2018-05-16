@@ -31,10 +31,9 @@ class Unsubscribe extends \Depage\HtmlForm\HtmlForm
     public function addChildElements()
     {
         $this->addHtml("<p>" . _("Please fill in your email to unsubscribe from out newsletter:") . "</p>");
-
         $this->addEmail("email", [
             'label' => _("Email"),
-            'defaultValue' => $_GET['unsubscribe'],
+            'defaultValue' => $_GET['unsubscribe'] ?? "",
             'required' => true,
         ]);
 

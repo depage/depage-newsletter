@@ -34,6 +34,7 @@ class Subscribe extends \Depage\HtmlForm\HtmlForm
 
         $this->addEmail("email", [
             'label' => _("Email"),
+            'defaultValue' => $_GET['subscribe'] ?? "",
             'required' => true,
         ]);
         $this->addText("firstname", [
