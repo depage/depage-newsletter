@@ -69,8 +69,8 @@ abstract class Subscription
         $this->lang = $params['lang'] ?? "en";
         $this->category = $params['category'] ?? "Default";
         $this->title = $params['title'] ?? "";
-        $this->subscribeForm = $params['subscribeForm'] ?? Forms\Subscribe("newsletterSubscribe");
-        $this->unsubscribeForm = $params['unsubscribeForm'] ?? Forms\Unsubscribe("newsletterUnsubscribe");
+        $this->subscribeForm = $params['subscribeForm'] ?? new Forms\Subscribe("newsletterSubscribe");
+        $this->unsubscribeForm = $params['unsubscribeForm'] ?? new Forms\Unsubscribe("newsletterUnsubscribe");
         $this->url = $params['url'] ?? (
             $_SERVER['HTTPS'] == 'on' ? "https://" : "http://" .
             $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI']
@@ -84,7 +84,7 @@ abstract class Subscription
      * @param mixed $provider, $params
      * @return void
      **/
-    public function factory($provider, $params)
+    public static function factory($provider, $params)
     {
         if ($provider == "remote" || $provider == "api") {
             return new \Depage\Newsletter\Providers\Remote($params);
@@ -139,7 +139,7 @@ abstract class Subscription
 
             if ($this->isSubscriber($values['email'], $values['lang'], $values['category'])) {
                 return "<p>" . sprintf(
-                    _("You're already a subscriber to our newsletter '%s'."),
+                    _("You're already a subscriber to our newsletter with the email '%s'."),
                     htmlentities($values['email'])
                 ) . "</p>";
             }
@@ -171,11 +171,11 @@ abstract class Subscription
      **/
     protected function processConfirmation()
     {
-        $this->confirm($_GET['v']);
+        $subscriber = $this->confirm($_GET['v']);
 
         return "<p>" . sprintf(
             _("Thank you for subscribing our newsletter."),
-            htmlentities($values['email'])
+            htmlentities($subscriber['email'])
         ) . "</p>";
     }
     // }}}
@@ -334,6 +334,19 @@ abstract class Subscription
             ->setSubject($title . _("Newsletter unsubscribed"))
             ->setText($text)
             ->send($this->notify);
+    }
+    // }}}
+
+    // {{{ updateSchema()
+    /**
+     * @brief updateSchema
+     *
+     * @param mixed
+     * @return void
+     **/
+    public static function updateSchema($pdo)
+    {
+
     }
     // }}}
 }
