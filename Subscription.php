@@ -172,11 +172,17 @@ abstract class Subscription
     protected function processConfirmation()
     {
         $subscriber = $this->confirm($_GET['v']);
+        $url = $this->url . "?unsubscribe=" . htmlentities($subscriber['email']);
 
-        return "<p>" . sprintf(
-            _("Thank you for subscribing our newsletter."),
-            htmlentities($subscriber['email'])
-        ) . "</p>";
+        return "<p>" .
+            _("Thank you for subscribing our newsletter.") .
+            "<br></br>" .
+            "<small>" .
+                _("To unsubscribe again visit the following url at any time:") .
+                "<br>" .
+                "<a href=\"$url\">$url</a>" .
+            "</small>" .
+        "</p>";
     }
     // }}}
     // {{{ processUnsubscribe()
@@ -319,7 +325,7 @@ abstract class Subscription
         }
 
         $text =
-            _("A subscriber has unsubscribed the newsletter:\n\n") .
+            _("A subscriber has unsubscribed from the newsletter:\n\n") .
             _("Email: ") . "$email\n" .
             _("Language: ") . "$lang\n" .
             _("Category: ") . "$category\n";
