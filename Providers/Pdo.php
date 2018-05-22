@@ -54,32 +54,44 @@ class Pdo extends \Depage\Newsletter\Subscription
      **/
     public function subscribe($email, $firstname = "", $lastname = "", $description = "", $lang = "en", $category = "Default")
     {
-        $validation = sha1($email . uniqid(dechex(mt_rand(256, 4095))));
-        $this->unsubscribe($email, $lang, $category);
+        list($validation, $validatedAt, $subscribedAt) = $this->getValidationFor($email);
+        if ($validation === false) {
+            $validation = sha1($email . uniqid(dechex(mt_rand(256, 4095))));
+        }
+        if (!is_array($category)) {
+            $category = [$category];
+        }
+        foreach ($category as $cat) {
+            $this->unsubscribe($email, $lang, $cat);
 
-        $query = $this->pdo->prepare(
-            "INSERT
-            INTO
-                {$this->tableSubscribers}
-            SET
-                email=:email,
-                firstname=:firstname,
-                lastname=:lastname,
-                description=:description,
-                category=:category,
-                lang=:lang,
-                validation=:validation
-            "
-        );
-        $success = $query->execute([
-            'email' => $email,
-            'firstname' => $firstname,
-            'lastname' => $lastname,
-            'description' => $description,
-            'lang' => $lang,
-            'category' => $category,
-            'validation' => $validation,
-        ]);
+            $query = $this->pdo->prepare(
+                "INSERT
+                INTO
+                    {$this->tableSubscribers}
+                SET
+                    email=:email,
+                    firstname=:firstname,
+                    lastname=:lastname,
+                    description=:description,
+                    category=:category,
+                    lang=:lang,
+                    validation=:validation,
+                    validatedAt=:validatedAt,
+                    subscribedAt=:subscribedAt
+                "
+            );
+            $success = $query->execute([
+                'email' => $email,
+                'firstname' => $firstname,
+                'lastname' => $lastname,
+                'description' => $description,
+                'lang' => $lang,
+                'category' => $cat,
+                'validation' => $validation,
+                'validatedAt' => $validatedAt,
+                'subscribedAt' => $subscribedAt,
+            ]);
+        }
 
         if ($success) {
             $this->sendConfirmationMail($email, $validation, $firstname, $lastname, $description, $lang, $category);
@@ -116,6 +128,33 @@ class Pdo extends \Depage\Newsletter\Subscription
         ]);
 
         return $query->fetchObject()->n > 0;
+    }
+    // }}}
+    // {{{ getValidationFor()
+    /**
+     * @brief getValidationFor
+     *
+     * @param mixed $email
+     * @return void
+     **/
+    protected function getValidationFor($email)
+    {
+        $query = $this->pdo->prepare(
+            "SELECT validation, validatedAt, subscribedAt FROM
+                {$this->tableSubscribers}
+            WHERE
+                email=:email
+            "
+        );
+        $success = $query->execute([
+            'email' => $email,
+        ]);
+
+        if ($r = $query->fetchObject()) {
+            return [$r->validation, $r->validatedAt, $r->subscribedAt];
+        }
+
+        return [false, null, null];
     }
     // }}}
     // {{{ confirm()
@@ -177,23 +216,32 @@ class Pdo extends \Depage\Newsletter\Subscription
      **/
     public function unsubscribe($email, $lang = "en", $category = "Default")
     {
-        $query = $this->pdo->prepare(
-            "DELETE
-            FROM
-                {$this->tableSubscribers}
-            WHERE
-                email=:email AND
-                lang=:lang AND
-                category=:category
-            "
-        );
-        $success = $query->execute([
-            'email' => $email,
-            'lang' => $lang,
-            'category' => $category,
-        ]);
+        $deleted = 0;
 
-        return $query->rowCount() > 0;
+        if (!is_array($category)) {
+            $category = [$category];
+        }
+        foreach ($category as $cat) {
+            $query = $this->pdo->prepare(
+                "DELETE
+                FROM
+                    {$this->tableSubscribers}
+                WHERE
+                    email=:email AND
+                    lang=:lang AND
+                    category=:category
+                "
+            );
+            $success = $query->execute([
+                'email' => $email,
+                'lang' => $lang,
+                'category' => $cat,
+            ]);
+
+            $deleted += $query->rowCount();
+        }
+
+        return $deleted > 0;
     }
     // }}}
 

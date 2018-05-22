@@ -138,13 +138,6 @@ abstract class Subscription
             ];
             $form->clearSession();
 
-            if ($this->isSubscriber($values['email'])) {
-                return "<p>" . sprintf(
-                    _("You're already a subscriber to our newsletter with the email '%s'."),
-                    htmlentities($values['email'])
-                ) . "</p>";
-            }
-
             $validation = $this->subscribe(
                 $values['email'],
                 $values['firstname'],

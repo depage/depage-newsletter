@@ -53,7 +53,6 @@ class Remote extends \Depage\Newsletter\Subscription
         if (!is_array($category)) {
             $category = [$category];
         }
-
         foreach ($category as $cat) {
             $values = [
                 'email' => $email,
@@ -147,7 +146,6 @@ class Remote extends \Depage\Newsletter\Subscription
         if (!is_array($category)) {
             $category = [$category];
         }
-
         foreach ($category as $cat) {
             $values = [
                 'email' => $email,
