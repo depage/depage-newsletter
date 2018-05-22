@@ -50,23 +50,33 @@ class Remote extends \Depage\Newsletter\Subscription
     {
         $url = $this->apiUrl . "newsletter/subscribe/";
 
-        $values = [
-            'email' => $email,
-            'firstname' => $firstname,
-            'lastname' => $lastname,
-            'description' => $description,
-            'lang' => $lang,
-            'category' => $category,
-        ];
+        if (!is_array($category)) {
+            $category = [$category];
+        }
 
-        $request = new \Depage\Http\Request($url);
-        $response = $request
-            ->setJson($values)
-            ->execute();
+        foreach ($category as $cat) {
+            $values = [
+                'email' => $email,
+                'firstname' => $firstname,
+                'lastname' => $lastname,
+                'description' => $description,
+                'lang' => $lang,
+                'category' => $cat,
+            ];
 
-        $this->sendConfirmationMail($email, $response->getJson()['success'], $firstname, $lastname, $description, $lang, $category);
+            $request = new \Depage\Http\Request($url);
+            $response = $request
+                ->setJson($values)
+                ->execute();
+        }
 
-        return $response->getJson()['success'];
+        $result = $response->getJson();
+
+        if (!is_null($result['validation'])) {
+            $this->sendConfirmationMail($email, $result['validation'], $firstname, $lastname, $description, $lang, $category);
+        }
+
+        return $response->getJson()['validation'];
     }
     // }}}
     // {{{ isSubscriber()
@@ -134,21 +144,27 @@ class Remote extends \Depage\Newsletter\Subscription
     {
         $url = $this->apiUrl . "newsletter/unsubscribe/";
 
-        $values = [
-            'email' => $email,
-            'lang' => $lang,
-            'category' => $category,
-        ];
+        if (!is_array($category)) {
+            $category = [$category];
+        }
 
-        $request = new \Depage\Http\Request($url);
-        $response = $request
-            ->setJson($values)
-            ->execute();
+        foreach ($category as $cat) {
+            $values = [
+                'email' => $email,
+                'lang' => $lang,
+                'category' => $cat,
+            ];
 
-        $success = $response->getJson()['success'];
+            $request = new \Depage\Http\Request($url);
+            $response = $request
+                ->setJson($values)
+                ->execute();
 
-        if ($success) {
-            $this->sendUnsubscribeNotification($email, $lang, $category);
+            $success = $response->getJson()['success'];
+
+            if ($success) {
+                $this->sendUnsubscribeNotification($email, $lang, $category);
+            }
         }
 
         return $success;

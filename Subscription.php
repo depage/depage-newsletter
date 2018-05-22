@@ -73,7 +73,8 @@ abstract class Subscription
         $this->unsubscribeForm = $params['unsubscribeForm'] ?? new Forms\Unsubscribe("newsletterUnsubscribe");
         $this->url = $params['url'] ?? (
             $_SERVER['HTTPS'] == 'on' ? "https://" : "http://" .
-            $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI']
+            $_SERVER['SERVER_NAME'] .
+            explode("?", $_SERVER['REQUEST_URI'])[0]
         );
     }
     // }}}
@@ -137,14 +138,14 @@ abstract class Subscription
             ];
             $form->clearSession();
 
-            if ($this->isSubscriber($values['email'], $values['lang'], $values['category'])) {
+            if ($this->isSubscriber($values['email'])) {
                 return "<p>" . sprintf(
                     _("You're already a subscriber to our newsletter with the email '%s'."),
                     htmlentities($values['email'])
                 ) . "</p>";
             }
 
-            $this->subscribe(
+            $validation = $this->subscribe(
                 $values['email'],
                 $values['firstname'],
                 $values['lastname'],
@@ -152,6 +153,10 @@ abstract class Subscription
                 $values['lang'],
                 $values['category']
             );
+
+            if (is_null($validation)) {
+                return "<p>" . _("Thank you, we updated your subscription.") . "</p>";
+            }
 
             return "<p>" . sprintf(
                 _("Please confirm your subscription, by opening the link in the email we just send to '%s'."),
