@@ -290,12 +290,23 @@ abstract class Subscription
 
         $text =
             _("There is a new subscriber to the newsletter:\n\n") .
-            _("Email: ") . "$email\n" .
-            _("First name: ") . "$firstname\n" .
-            _("Last name: ") . "$lastname\n" .
-            _("Description: ") . "$description\n" .
-            _("Language: ") . "$lang\n" .
-            _("Category: ") . "$category\n";
+            _("Email: ") . "$email\n";
+
+        if (!empty($firstname)) {
+            $text .= _("First name: ") . "$firstname\n";
+        }
+        if (!empty($lastname)) {
+            $text .= _("Last name: ") . "$lastname\n";
+        }
+        if (!empty($description)) {
+            $text .= _("Description: ") . "$description\n";
+        }
+        if (!empty($lang)) {
+            $text .= _("Language: ") . "$lang\n";
+        }
+        if (!empty($category)) {
+            $text .= _("Category: ") . "$category\n";
+        }
 
         $title = $this->title;
         if (!empty($title)) {
@@ -324,9 +335,14 @@ abstract class Subscription
 
         $text =
             _("A subscriber has unsubscribed from the newsletter:\n\n") .
-            _("Email: ") . "$email\n" .
-            _("Language: ") . "$lang\n" .
-            _("Category: ") . "$category\n";
+            _("Email: ") . "$email\n";
+
+        if (!empty($lang)) {
+            $text .= _("Language: ") . "$lang\n";
+        }
+        if (!empty($category)) {
+            $text .= _("Category: ") . "$category\n";
+        }
 
         $title = $this->title;
         if (!empty($title)) {
