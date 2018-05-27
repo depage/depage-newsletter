@@ -69,6 +69,7 @@ abstract class Subscription
         $this->lang = $params['lang'] ?? "en";
         $this->category = $params['category'] ?? "Default";
         $this->title = $params['title'] ?? "";
+        $this->emailSignature = $params['emailSignature'] ?? "";
         $this->subscribeForm = $params['subscribeForm'] ?? new Forms\Subscribe("newsletterSubscribe");
         $this->unsubscribeForm = $params['unsubscribeForm'] ?? new Forms\Unsubscribe("newsletterUnsubscribe");
         $this->url = $params['url'] ?? (
@@ -128,7 +129,7 @@ abstract class Subscription
         $form = $this->subscribeForm;
         $form->process();
 
-        if ($form->valid) {
+        if ($form->validate()) {
             $values = $form->getValues() + [
                 'firstname' => "",
                 'lastname' => "",
@@ -195,7 +196,7 @@ abstract class Subscription
         $form = $this->unsubscribeForm;
         $form->process();
 
-        if ($form->valid) {
+        if ($form->validate()) {
             $values = $form->getValues();
 
             $this->unsubscribe($values['email'], $this->lang, $this->category);
@@ -261,7 +262,7 @@ abstract class Subscription
 
         $text =
             _("Dear Subscriber,\n\nPlease open the following link to validate you registration to the newsletter:\n") .
-            "{$url}\n";
+            "{$url}\n\n{$this->emailSignature}\n";
 
         $title = $this->title;
         if (!empty($title)) {
