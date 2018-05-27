@@ -126,7 +126,7 @@ class Remote extends \Depage\Newsletter\Subscription
         $subscriber = $response->getJson()['subscriber'];
 
         if ($subscriber) {
-            $this->sendSubscribeNotification($subscriber['email'], $subscriber['firstname'], $subscriber['lastname'], $subscriber['description'], $subscriber['lang'], $subscriber['category']);
+            $this->sendSubscribeNotification($subscriber['email'], $subscriber['firstname'], $subscriber['lastname'], $subscriber['description'], $subscriber['lang']);
         }
 
         return $response->getJson()['success'];
