@@ -283,7 +283,7 @@ abstract class Subscription
      * @param mixed
      * @return void
      **/
-    protected function sendSubscribeNotification($email, $firstname = "", $lastname = "", $description = "", $lang = "en", $category = "Default")
+    protected function sendSubscribeNotification($email, $firstname = "", $lastname = "", $description = "", $lang = "en")
     {
         if (empty($this->notify)) {
             return;
@@ -305,9 +305,6 @@ abstract class Subscription
         if (!empty($lang)) {
             $text .= _("Language: ") . "$lang\n";
         }
-        if (!empty($category)) {
-            $text .= _("Category: ") . "$category\n";
-        }
 
         $title = $this->title;
         if (!empty($title)) {
@@ -328,7 +325,7 @@ abstract class Subscription
      * @param mixed
      * @return void
      **/
-    protected function sendUnsubscribeNotification($email, $lang = "en", $category = "Default")
+    protected function sendUnsubscribeNotification($email, $lang = "en")
     {
         if (empty($this->notify)) {
             return;
@@ -340,9 +337,6 @@ abstract class Subscription
 
         if (!empty($lang)) {
             $text .= _("Language: ") . "$lang\n";
-        }
-        if (!empty($category)) {
-            $text .= _("Category: ") . "$category\n";
         }
 
         $title = $this->title;

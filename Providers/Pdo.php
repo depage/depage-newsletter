@@ -199,7 +199,7 @@ class Pdo extends \Depage\Newsletter\Subscription
                 'validation' => $validation,
             ]);
 
-            $this->sendSubscribeNotification($subscriber['email'], $subscriber['firstname'], $subscriber['lastname'], $subscriber['description'], $subscriber['lang'], $subscriber['category']);
+            $this->sendSubscribeNotification($subscriber['email'], $subscriber['firstname'], $subscriber['lastname'], $subscriber['description'], $subscriber['lang']);
 
             return $subscriber;
         }
@@ -239,6 +239,10 @@ class Pdo extends \Depage\Newsletter\Subscription
             ]);
 
             $deleted += $query->rowCount();
+        }
+
+        if ($deleted > 0 && $success) {
+            $this->sendUnsubscribeNotification($email, $lang);
         }
 
         return $deleted > 0;
