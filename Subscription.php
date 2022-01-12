@@ -285,7 +285,7 @@ abstract class Subscription
      **/
     protected function sendSubscribeNotification($email, $firstname = "", $lastname = "", $description = "", $lang = "en")
     {
-        if (empty($this->notify)) {
+        if (empty($this->notify) || empty($email)) {
             return;
         }
 
@@ -327,7 +327,7 @@ abstract class Subscription
      **/
     protected function sendUnsubscribeNotification($email, $lang = "en")
     {
-        if (empty($this->notify)) {
+        if (empty($this->notify) || empty($email)) {
             return;
         }
 
